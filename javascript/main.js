@@ -20,42 +20,42 @@
 		}
 
 		return {
-			generate: generateTemplate
-			,update: updateView
+			generateTemplate: generateTemplate
+			,updateView: updateView
 		}
 
 	})(); // DataDisplay
 
 	var FlickrAPI = (function(){
 
-		var APIKey = "61291f3f1fae46b86f41b14e2d3b1899"
-			,FORMAT = "json"
-			,FLICKRAPIURL = "https://api.flickr.com/services/rest/";		
+		var APIKEY = "61291f3f1fae46b86f41b14e2d3b1899"
+				,FORMAT = "json"
+				,FLICKRAPIURL = "https://api.flickr.com/services/rest/";		
 
 		function createImageSrc( farmId, serverId, id, secret, size ) {
 
 			var imgSrc = "https://farm" + farmId + ".staticflickr.com/" + serverId + "/" + id + "_" + secret + "_" + size + ".jpg";
 
-		return imgSrc;
+			return imgSrc;
 
 		}
 
 		function pullFromFlickr( flickrAPIoptions, flickrSuccess ) {
 
 			var APIarguments = {
-				apiKey: APIKey
-				,format: FORMAT
-			}
+					api_key: APIKEY,
+					format: FORMAT
+			};
 
 			$.extend( APIarguments, flickrAPIoptions );
 			console.log( "this is APIarguments:", APIarguments );
-
+			console.log( "this is flickrAPIoptions:", flickrAPIoptions );
 			var ajaxOptions = {
-				url: FLICKRAPIURL
-				,data: APIarguments
-				,dataType: 'jsonp'
-				,jsonCallback: 'jsonFlickrApi'
-				,success: flickrSuccess
+					url: FLICKRAPIURL
+					,data: APIarguments
+					,dataType: 'jsonp'
+					,jsonpCallback: 'jsonFlickrApi'
+					,success: flickrSuccess
 			}
 
 			$.ajax( ajaxOptions );
@@ -63,17 +63,19 @@
 		}
 
 		function onFlickrSuccess( data ) {
-			
+			console.log( 'this is data from onFlickrSuccess:', data );
 			var slider = $('.bxslider')
 					,dataModel = [];
+					console.log( "this is data:", data );
 
 			for( var i = 0; i < data.photos.photo.length; i++ ) {
 				var curr = data.photos.photo[ i ]
-					,farmId = curr.farm
-					,serverId = curr.server
-					,id = curr.id
-					,secret = curr.secret
-					,size = 'b';
+						,farmId = curr.farm
+						,serverId = curr.server
+						,id = curr.id
+						,secret = curr.secret
+						,size = 'b';
+
 				var img = createImageSrc( farmId, serverId, id, secret, size );
 
 				dataModel.push( img );
@@ -113,12 +115,10 @@
 			, function( data ) {
 				var dataModel = FlickrAPI.onFlickrSuccess( data );
 
+				console.log( 'this is dataModel:', dataModel );
+
 				for( var i = 0; i < dataModel.length; i++ ) {
-					DataDisplay
-						.generateTemplate(
-							'#flickr-gallery'
-							, { imgSrc: dataModel[ i ] }
-						);
+					DataDisplay.generateTemplate('#flickr-gallery', { imgSrc: dataModel[ i ] });
 
 					DataDisplay.updateView( '.bxslider' );
 				}
